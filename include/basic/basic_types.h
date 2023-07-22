@@ -12,6 +12,7 @@
 #include <math.h>
 #include <complex.h>
 #include <errno.h>
+#include <time.h>
 
 typedef unsigned char uint8;
 typedef signed char int8;

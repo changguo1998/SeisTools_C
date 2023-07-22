@@ -6,8 +6,8 @@
 
 Int DAYS_OF_MONTH_USUAL[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30,
                                31, 30, 31},
-        DAYS_OF_MONTH_JULIAN[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30,
-                                    31, 30, 31};
+        DAYS_OF_MONTH_LEAP[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30,
+                                  31, 30, 31};
 
 Date date_init(Int year, Int month, Int day){
     Date _t;
@@ -17,26 +17,73 @@ Date date_init(Int year, Int month, Int day){
     return _t;
 }
 
-Int date_day_of_year(Date date){
+bool date_is_leap_year(UInt year){
     bool flag;
-    int i;
-    Int day_count;
-    flag = false;
-    if(date.year % 100){
-        if(date.year % 4)
-            flag = false;
+    if(year % 100){
+        if(year % 4)
+            return false;
         else
-            flag = true;
+            return true;
     }else{
-        if(date.year % 400)
-            flag = false;
+        if(year % 400)
+            return false;
         else
-            flag = true;
+            return true;
     }
+}
+
+Int date_day_of_year(Date date){
+    int i;
+    Int day_count, month, day;
+    bool flag;
+    if(date.year < 0){
+        errno = ETIME;
+        perror("(date_day_of_year) year less than 0");
+    }
+    flag = date_is_leap_year(date.year);
     day_count = 0;
-    for(i = 0; i < date.month - 1; i++) day_count += flag ? DAYS_OF_MONTH_JULIAN[i] : DAYS_OF_MONTH_USUAL[i];
-    day_count += date.day;
+    month = date.month - 1;
+    day = date.day - 1;
+    for(i = 0; i < month; i++) day_count += flag ? DAYS_OF_MONTH_LEAP[i] : DAYS_OF_MONTH_USUAL[i];
+    day_count += day + 1;
     return day_count;
+}
+
+void date_regularize(Date *date){
+    Int n_day, year, month, day;
+    year = date->year;
+    month = date->month - 1;
+    day = date->day - 1;
+    while(month < 0){
+        year -= 1;
+        month += 12;
+    }
+    while(month > 11){
+        year += 1;
+        month -= 12;
+    }
+    while(day < 0){
+        month -= 1;
+        if(month < 0){
+            month += 12;
+            year -= 1;
+        }
+        n_day = date_is_leap_year(year) ? DAYS_OF_MONTH_LEAP[month] : DAYS_OF_MONTH_USUAL[month];
+        day += n_day;
+    }
+    n_day = date_is_leap_year(year) ? DAYS_OF_MONTH_LEAP[month] : DAYS_OF_MONTH_USUAL[month];
+    while(day >= n_day){
+        day -= n_day;
+        month += 1;
+        if(month > 11){
+            year += 1;
+            month -= 12;
+        }
+        n_day = date_is_leap_year(year) ? DAYS_OF_MONTH_LEAP[month] : DAYS_OF_MONTH_USUAL[month];
+    }
+    date->year = year;
+    date->month = month + 1;
+    date->day = day + 1;
 }
 
 int time_precision_level(Time *t){
@@ -168,7 +215,7 @@ Time time_regularize(Time *t){
             default:
                 break;
         }
-    memcpy(t, &buff, sizeof (Time));
+    memcpy(t, &buff, sizeof(Time));
 #ifdef SEISTOOLS_C_DATETIME_H_DEBUG
     printf("(_time_regularize) h: %ld, m: %ld, s: %ld, ms: %ld, mus: %ld, ns: %ld\n", t->hour, t->minute, t->second,
            t->millisecond, t->microsecond, t->nanosecond);
@@ -244,4 +291,41 @@ Time time_time_diff(Time t1, Time t2){
 Float time_time2second(Time t){
     return t.hour * 3600.0 + t.minute * 60.0 + t.second + (Float)t.millisecond * 1e-3 + (Float)t.microsecond * 1e-6 +
            (Float)t.nanosecond * 1e-9;
+}
+
+DateTime datetime_now(void){
+    struct tm *_t;
+    time_t _tmr;
+    DateTime dt;
+    _tmr = time(NULL);
+    _t = localtime(&_tmr);
+    dt.date.year = _t->tm_year + 1900;
+    dt.date.month = _t->tm_mon + 1;
+    dt.date.day = _t->tm_mday;
+    dt.time.hour = _t->tm_hour;
+    dt.time.minute = _t->tm_min;
+    dt.time.second = _t->tm_sec;
+    dt.time.millisecond = 0;
+    dt.time.microsecond = 0;
+    dt.time.nanosecond = 0;
+    dt.timezone = 0;
+    return dt;
+}
+
+void datetime_regularize(DateTime *dt){
+    Int i;
+    time_regularize(&(dt->time));
+    if(dt->time.hour < 0){
+        i = -((dt->time).hour) / 24 + 1;
+        dt->time.hour += i * 24;
+        dt->date.day -= i;
+        time_regularize(&(dt->time));
+    }
+    if(dt->time.hour >= 24){
+        i = (dt->time.hour) / 24;
+        dt->time.hour -= i * 24;
+        dt->date.day += i;
+        time_regularize(&(dt->time));
+    }
+    date_regularize(&(dt->date));
 }

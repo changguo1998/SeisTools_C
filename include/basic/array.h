@@ -9,7 +9,7 @@
 
 #define ARRAY_CHECK_BOUNDARY
 
-typedef struct{
+typedef struct seistools_vector_t{
     UInt n;
     size_t e_byte;
     void *data;
@@ -25,7 +25,7 @@ void vector_get(void *buf, Vector vec, UInt index);
 
 void vector_set(Vector vec, UInt index, void *buf);
 
-typedef struct{
+typedef struct seistools_int_vector_t{
     UInt n;
     Int *data;
 } IntVec;
@@ -40,7 +40,7 @@ Int ivec_get(IntVec ivec, UInt index);
 
 void ivec_set(IntVec ivec, UInt index, Int value);
 
-typedef struct{
+typedef struct seistools_float_vector_t{
     UInt n;
     Float *data;
 } FloatVec;
@@ -55,7 +55,7 @@ Float fvec_get(FloatVec fvec, UInt index);
 
 void fvec_set(FloatVec fvec, UInt index, Float value);
 
-typedef struct{
+typedef struct seistools_matrix_t{
     Int m, n;
     size_t e_byte;
     void *data;

@@ -24,6 +24,14 @@ void fvec_detrend(FloatVec fvec);
 
 void fvec_taper(FloatVec fvec, FloatVec weight);
 
+void fvec_xcorr(FloatVec xc, FloatVec fv1, FloatVec fv2, Int shift1, Int shift2);
+
+void fvec_conv(FloatVec cv, FloatVec fv1, FloatVec fv2);
+
+void fvec_xcorr_fft(FloatVec xc, FloatVec fv1, FloatVec fv2);
+
+void fvec_conv_fft(FloatVec cv, FloatVec fv1, FloatVec fv2);
+
 typedef struct{
     Float k;
     void *b;
@@ -31,5 +39,6 @@ typedef struct{
 } Filter;
 
 void fvec_filtfilt(FloatVec fvec, Filter v);
+
 
 #endif //SEISTOOLS_C_DSP_H
