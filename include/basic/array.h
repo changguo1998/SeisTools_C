@@ -34,6 +34,8 @@ IntVec ivec_zeros(UInt length);
 
 IntVec ivec_deepcopy(IntVec ivec);
 
+void ivec_free(IntVec *ivec);
+
 Int ivec_get(IntVec ivec, UInt index);
 
 void ivec_set(IntVec ivec, UInt index, Int value);
@@ -46,6 +48,8 @@ typedef struct{
 FloatVec fvec_zeros(UInt length);
 
 FloatVec fvec_deepcopy(FloatVec fvec);
+
+void fvec_free(FloatVec *fvec);
 
 Float fvec_get(FloatVec fvec, UInt index);
 
