@@ -50,17 +50,19 @@ Int date_day_of_year(Date date){
 }
 
 void date_regularize(Date *date){
-    Int n_day, year, month, day;
+    Int n_day, year, month, day, i;
     year = date->year;
     month = date->month - 1;
     day = date->day - 1;
-    while(month < 0){
-        year -= 1;
-        month += 12;
+    if(month < 0){
+        i = (-month) / 12 + 1;
+        year -= i;
+        month += i * 12;
     }
-    while(month > 11){
-        year += 1;
-        month -= 12;
+    if(month > 11){
+        i = month / 12;
+        year += i;
+        month -= 12 * i;
     }
     while(day < 0){
         month -= 1;
@@ -71,15 +73,14 @@ void date_regularize(Date *date){
         n_day = date_is_leap_year(year) ? DAYS_OF_MONTH_LEAP[month] : DAYS_OF_MONTH_USUAL[month];
         day += n_day;
     }
-    n_day = date_is_leap_year(year) ? DAYS_OF_MONTH_LEAP[month] : DAYS_OF_MONTH_USUAL[month];
     while(day >= n_day){
+        n_day = date_is_leap_year(year) ? DAYS_OF_MONTH_LEAP[month] : DAYS_OF_MONTH_USUAL[month];
         day -= n_day;
         month += 1;
         if(month > 11){
             year += 1;
             month -= 12;
         }
-        n_day = date_is_leap_year(year) ? DAYS_OF_MONTH_LEAP[month] : DAYS_OF_MONTH_USUAL[month];
     }
     date->year = year;
     date->month = month + 1;
@@ -289,7 +290,11 @@ Time time_time_diff(Time t1, Time t2){
 }
 
 Float time_time2second(Time t){
-    return t.hour * 3600.0 + t.minute * 60.0 + t.second + (Float)t.millisecond * 1e-3 + (Float)t.microsecond * 1e-6 +
+    return (Float)t.hour * 3600.0 +
+           (Float)t.minute * 60.0 +
+           (Float)t.second +
+           (Float)t.millisecond * 1e-3 +
+           (Float)t.microsecond * 1e-6 +
            (Float)t.nanosecond * 1e-9;
 }
 

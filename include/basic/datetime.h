@@ -10,8 +10,6 @@
 
 //#define SEISTOOLS_C_DATETIME_H_DEBUG
 
-//Int DAYS_OF_MONTH_USUAL[12], DAYS_OF_MONTH_JULIAN[12];
-
 typedef struct seistools_date_t{
     Int year, month, day;
 } Date;

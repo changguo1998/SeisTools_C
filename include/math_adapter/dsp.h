@@ -6,7 +6,7 @@
 #define SEISTOOLS_C_DSP_H
 
 //#include "ftw.h"
-#include "../basic/array.h"
+#include "../basic/array_template.h"
 
 Float fvec_max(FloatVec fvec, UInt *index);
 
@@ -32,6 +32,10 @@ void fvec_xcorr_fft(FloatVec xc, FloatVec fv1, FloatVec fv2);
 
 void fvec_conv_fft(FloatVec cv, FloatVec fv1, FloatVec fv2);
 
+Float fvec_dot(FloatVec fv1, FloatVec fv2);
+
+void fvec_cross(FloatVec result, FloatVec fv1, FloatVec fv2);
+
 typedef struct{
     Float k;
     void *b;
@@ -40,5 +44,6 @@ typedef struct{
 
 void fvec_filtfilt(FloatVec fvec, Filter v);
 
+void fmat_matrix_product(FloatMat result, FloatMat A, FloatMat B);
 
 #endif //SEISTOOLS_C_DSP_H

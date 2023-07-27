@@ -2,20 +2,31 @@
 // Created by chang on 2023/7/23.
 //
 
-#include "../include/basic/array.h"
+#include "../include/basic/array_template.h"
 #include "../include/math_adapter/dsp.h"
 #include <time.h>
 
 #define VECTOR_LENGTH 5
 
+void printmat(FloatMat fm){
+    UInt i, j;
+    for(i = 0; i < fm.nrow; i++){
+        for(j = 0; j < fm.ncol; j++){
+            printf("%f ", fmat_get(fm, i, j));
+        }
+        printf("\n");
+    }
+}
+
 int main(void){
-    FloatVec fv, fw;
+    FloatVec fu, fv, fw;
+    FloatMat fm_A, fm_B, fm_C;
     IntVec iv;
     UInt uibuff;
     Int i;
-    srand(time(NULL));
+    srand((unsigned)time(NULL));
     fv = fvec_zeros(VECTOR_LENGTH);
-    for(i = 0; i < fv.n; i++) fvec_set(fv, i, roundl(rand() / ((Float)RAND_MAX) * 100.0) * 0.01);
+    for(i = 0; i < fv.n; i++) fvec_set(fv, i, roundl((Float)rand() / ((Float)RAND_MAX) * 100.0) * 0.01);
     fw = fvec_deepcopy(fv);
 
     printf("fv:\n");
@@ -40,5 +51,53 @@ int main(void){
     fvec_free(&fv);
     fvec_free(&fw);
     ivec_free(&iv);
+
+    fu = fvec_zeros(3);
+    fv = fvec_zeros(3);
+    fw = fvec_zeros(3);
+
+    fvec_set(fu, 0, 1.0);
+    fvec_set(fu, 1, 0.0);
+    fvec_set(fu, 2, 0.0);
+    fvec_set(fv, 0, 1.0);
+    fvec_set(fv, 1, 1.0);
+    fvec_set(fv, 2, 0.0);
+    fvec_cross(fw, fu, fv);
+    printf("fu:");
+    for(i = 0; i < 3; i++) printf(" %f", fvec_get(fu, i));
+    printf("\n");
+    printf("fv:");
+    for(i = 0; i < 3; i++) printf(" %f", fvec_get(fv, i));
+    printf("\n");
+    printf("fu . fv: %f\n", fvec_dot(fu, fv));
+    printf("fu x fv:");
+    for(i = 0; i < 3; i++) printf(" %f", fvec_get(fw, i));
+    printf("\n");
+
+    fvec_free(&fu);
+    fvec_free(&fv);
+    fvec_free(&fw);
+
+    fm_A = fmat_zeros(3, 2);
+    fm_B = fmat_zeros(2, 1);
+    fm_C = fmat_zeros(3, 1);
+    fmat_set(fm_A, 0, 0, 1.0);
+    fmat_set(fm_A, 0, 1, 2.0);
+    fmat_set(fm_A, 1, 0, 3.0);
+    fmat_set(fm_A, 1, 1, 4.0);
+    fmat_set(fm_A, 2, 0, 5.0);
+    fmat_set(fm_A, 2, 1, 6.0);
+    fmat_set(fm_B, 0, 0, 1.0);
+    fmat_set(fm_B, 1, 0, 0.5);
+    fmat_matrix_product(fm_C, fm_A, fm_B);
+    printf("A:\n");
+    printmat(fm_A);
+    printf("B:\n");
+    printmat(fm_B);
+    printf("C:\n");
+    printmat(fm_C);
+    fmat_free(&fm_A);
+    fmat_free(&fm_B);
+    fmat_free(&fm_C);
     return 0;
 }

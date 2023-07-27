@@ -12,6 +12,7 @@
 #include <math.h>
 #include <complex.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <time.h>
 
 typedef unsigned char uint8;
@@ -23,5 +24,6 @@ typedef signed long int int64;
 typedef int64 Int;
 typedef uint64 UInt;
 typedef double Float;
+typedef double complex Complex;
 
 #endif //SEISTOOLS_C_BASIC_TYPES_H

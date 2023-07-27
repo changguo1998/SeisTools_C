@@ -75,3 +75,48 @@ void fvec_sort(FloatVec fvec_sorted, FloatVec fvec, IntVec perm){
     for(i = 0; i < fvec.n; i++) perm.data[id_buff[i]] = i;
     free(id_buff);
 }
+
+Float fvec_dot(FloatVec fv1, FloatVec fv2){
+    UInt i;
+    Float buff;
+#ifdef ARRAY_CHECK_BOUNDARY
+    if(fv1.n != fv2.n){
+        errno = ERANGE;
+        perror("(fvec_dot) Dimension mismatch");
+    }
+#endif
+    buff = 0.0;
+    for(i = 0; i < fv1.n; i++) buff += fv1.data[i] * fv2.data[i];
+    return buff;
+}
+
+void fvec_cross(FloatVec result, FloatVec fv1, FloatVec fv2){
+#ifdef ARRAY_CHECK_BOUNDARY
+    if(fv1.n != fv2.n){
+        errno = ERANGE;
+        perror("(fvec_dot) Dimension mismatch");
+    }
+    if(fv1.n != 3){
+        errno = ERANGE;
+        perror("(fvec_dot) Dimension must be 3");
+    }
+#endif
+    fvec_set(result, 0, fv1.data[1] * fv2.data[2] - fv1.data[2] * fv2.data[1]);
+    fvec_set(result, 1, fv1.data[2] * fv2.data[0] - fv1.data[0] * fv2.data[2]);
+    fvec_set(result, 2, fv1.data[0] * fv2.data[1] - fv1.data[1] * fv2.data[0]);
+}
+
+void fmat_matrix_product(FloatMat result, FloatMat A, FloatMat B){
+    UInt i, j, k;
+#ifdef ARRAY_CHECK_BOUNDARY
+    if((result.nrow != A.nrow) || (result.ncol != B.ncol) || (A.ncol != B.nrow)){
+        errno = ERANGE;
+        perror("(fvec_dot) Dimension mismatch");
+    }
+#endif
+    for(i = 0; i < result.nrow * result.ncol; i++) result.data[i] = 0.0;
+    for(i = 0; i < result.nrow; i++)
+        for(j = 0; j < result.ncol; j++)
+            for(k = 0; k < A.ncol; k++)
+                result.data[i + j * result.nrow] += A.data[i + k * A.nrow] * B.data[k + j * B.nrow];
+}
