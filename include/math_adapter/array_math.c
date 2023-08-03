@@ -23,48 +23,28 @@
  *
  */
 
-#ifndef SEISTOOLS_C_DSP_H
-#define SEISTOOLS_C_DSP_H
+#include "array_math.h"
 
-//#include "ftw.h"
-#include "../basic/array_template.h"
+array_template_sum_definition(int)
 
-Float fvec_max(FloatVec fvec, UInt *index);
+array_template_sum_definition(int64)
 
-Float fvec_min(FloatVec fvec, UInt *index);
+array_template_sum_definition(float)
 
-Float fvec_mean(FloatVec fvec);
+array_template_sum_definition(double)
 
-Float fvec_var(FloatVec fvec, Float correct);
+array_template_var_definition(float, int)
 
-Float fvec_std(FloatVec fvec, Float correct);
+array_template_var_definition(float, float)
 
-void fvec_sort(FloatVec fvec_sorted, FloatVec fvec, IntVec perm);
+array_template_var_definition(double, int64)
 
-void fvec_detrend(FloatVec fvec);
+array_template_var_definition(double, double)
 
-void fvec_taper(FloatVec fvec, FloatVec weight);
+array_template_std_definition(float, int)
 
-void fvec_xcorr(FloatVec xc, FloatVec fv1, FloatVec fv2, Int shift1, Int shift2);
+array_template_std_definition(float, float)
 
-void fvec_conv(FloatVec cv, FloatVec fv1, FloatVec fv2);
+array_template_std_definition(double, int64)
 
-void fvec_xcorr_fft(FloatVec xc, FloatVec fv1, FloatVec fv2);
-
-void fvec_conv_fft(FloatVec cv, FloatVec fv1, FloatVec fv2);
-
-Float fvec_dot(FloatVec fv1, FloatVec fv2);
-
-void fvec_cross(FloatVec result, FloatVec fv1, FloatVec fv2);
-
-typedef struct{
-    Float k;
-    void *b;
-    void *a;
-} Filter;
-
-void fvec_filtfilt(FloatVec fvec, Filter v);
-
-void fmat_matrix_product(FloatMat result, FloatMat A, FloatMat B);
-
-#endif //SEISTOOLS_C_DSP_H
+array_template_std_definition(double, double)
