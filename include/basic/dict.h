@@ -23,4 +23,24 @@
  *
  */
 
-#include "raytrace.h"
+#ifndef SEISTOOLS_C_DICT_H
+#define SEISTOOLS_C_DICT_H
+
+#include "basic_types.h"
+
+typedef struct pair_t{
+    int64 kl;
+    char *key;
+    void *val;
+} Pair;
+
+struct d_dict_t{
+    Pair pair;
+    struct d_dict_t *next;
+};
+
+typedef struct d_dict_t *DDict;
+
+typedef Pair *SDict;
+
+#endif //SEISTOOLS_C_DICT_H

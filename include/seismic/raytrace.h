@@ -36,6 +36,6 @@ typedef struct seistools_raytrace_phase_t{
 
 void raytrace_trace(RaytracePhase*p, Float x0, Float dep1, Float dep2, FloatVec dep, FloatVec vel);
 
-void raytrace_trace_p(RaytracePhase *p, FloatVec dep, FloatVec vel);
+//void raytrace_trace_p(RaytracePhase *p, FloatVec dep, FloatVec vel);
 
 #endif //SEISTOOLS_C_RAYTRACE_H

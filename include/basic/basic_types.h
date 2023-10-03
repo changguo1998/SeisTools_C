@@ -34,6 +34,7 @@
 #include <complex.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <time.h>
 
 typedef unsigned char uint8;

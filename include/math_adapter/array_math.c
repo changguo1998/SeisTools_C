@@ -25,26 +25,12 @@
 
 #include "array_math.h"
 
-array_template_sum_definition(int)
+array_template_math_collection_definition(float, int)
 
-array_template_sum_definition(int64)
+array_template_math_collection_definition(double, uint64)
 
-array_template_sum_definition(float)
+array_template_math_collection_definition(double, int64)
 
-array_template_sum_definition(double)
+array_template_math_collection_definition(float, float)
 
-array_template_var_definition(float, int)
-
-array_template_var_definition(float, float)
-
-array_template_var_definition(double, int64)
-
-array_template_var_definition(double, double)
-
-array_template_std_definition(float, int)
-
-array_template_std_definition(float, float)
-
-array_template_std_definition(double, int64)
-
-array_template_std_definition(double, double)
+array_template_math_collection_definition(double, double)

@@ -30,25 +30,108 @@
 
 #define ARRAY_CHECK_BOUNDARY
 
-#define array_m_vector_get(vec, i) ((vec).v[(i)])
+#define vector_get(vec, i) ((vec).v[(i)])
 
-#define array_m_vector_set_(vec, i, val) array_m_vector_get(vec, i) = (val)
+#define Vector(T) Vector_##T
 
-typedef struct array_inner_used_vector{
-    uint64 n, *v;
-} array_inner_ivec_t;
+#define vector_template_type_definition(T) typedef struct vector_##T##_t{ \
+    uint64 n; \
+    T *v; \
+} Vector(T);
 
-array_inner_ivec_t array_inner_ivec_alloc(uint64 n);
+// alloc
 
-array_inner_ivec_t array_inner_ivec_dcopy(array_inner_ivec_t iv);
+#define vector_template_alloc_declaration(T) Vector(T) vector_##T##_alloc(uint64 n)
 
-void array_inner_ivec_free_(array_inner_ivec_t *iv);
+#define vector_template_alloc_definition(T) vector_template_alloc_declaration(T){ \
+    Vector(T) _vec;                                                               \
+    _vec.n = n;                                                                   \
+    _vec.v = (T *)malloc(n * sizeof(T));                                          \
+return _vec;                                                                      \
+}
 
-uint64 array_inner_ivec_product(array_inner_ivec_t iv);
+// dcopy
 
-uint64 array_inner_ivec_cart2lin(array_inner_ivec_t coor, array_inner_ivec_t size);
+#define vector_template_dcopy_declaration(T) Vector(T) vector_##T##_dcopy(Vector(T) arr)
 
-void array_inner_ivec_lin2cart_(array_inner_ivec_t coor, uint64 lin, array_inner_ivec_t size);
+#define vector_template_dcopy_definition(T) vector_template_dcopy_declaration(T){ \
+    Vector(T) _arr;                                                               \
+    _arr = vector_##T##_alloc(arr.n);                                             \
+    memcpy(_arr.v, arr.v, arr.n * sizeof(T));                                     \
+    return _arr;                                                                  \
+}
+
+// read
+
+#define vector_template_read_declaration(T) Vector(T) vector_##T##_read(int fid)
+
+#define vector_template_read_definition(T) vector_template_read_declaration(T){ \
+    Vector(T) _vec; \
+    read(fid, &(_vec.n), sizeof(uint64)); \
+    _vec.v = (T *)malloc(_vec.n * sizeof(T)); \
+    read(fid, _vec.v, _vec.n*sizeof(T)); \
+    return _vec; \
+}
+
+// write
+
+#define vector_template_write_declaration(T) void vector_##T##_write(int fid, Vector(T) vec)
+
+#define vector_template_write_definition(T) vector_template_write_declaration(T){ \
+    write(fid, &(vec.n), sizeof(uint64)); \
+    write(fid, vec.v, vec.n * sizeof(T)); \
+}
+
+// free
+
+#define vector_template_free_declaration(T) void vector_##T##_free_(Vector(T) *arr)
+
+#define vector_template_free_definition(T) vector_template_free_declaration(T){ \
+    if(arr->v != NULL) free(arr->v);                                            \
+    arr->v = NULL;                                                              \
+    arr->n = 0;                                                                 \
+}
+
+#define vector_template_product_declaration(T) T vector_##T##_product(Vector(T) arr)
+
+#define vector_template_product_definition(T) vector_template_product_declaration(T){ \
+    uint64 i;                                                                         \
+    T v;                                                                              \
+    v = (T)1;                                                                         \
+    for(i=0; i<arr.n; i++) v *= vector_get(arr, i);                                   \
+    return v;                                                                         \
+    }
+
+
+#define vector_template_collection_declaration(T) vector_template_type_definition(T)\
+vector_template_alloc_declaration(T); \
+vector_template_dcopy_declaration(T); \
+vector_template_read_declaration(T); \
+vector_template_write_declaration(T); \
+vector_template_free_declaration(T); \
+vector_template_product_declaration(T);
+
+#define vector_template_collection_definition(T) \
+vector_template_alloc_definition(T) \
+vector_template_dcopy_definition(T) \
+vector_template_read_definition(T) \
+vector_template_write_definition(T) \
+vector_template_free_definition(T) \
+vector_template_product_definition(T)
+
+vector_template_collection_declaration(int)
+
+vector_template_collection_declaration(uint64)
+
+vector_template_collection_declaration(int64)
+
+vector_template_collection_declaration(float)
+
+vector_template_collection_declaration(double)
+
+uint64 vector_uint64_cart2lin(Vector_uint64 coor, Vector_uint64 size);
+
+void vector_uint64_lin2cart_(Vector_uint64 coor, uint64 lin, Vector_uint64 size);
 
 // !------------------------------------------------------------
 
@@ -80,19 +163,40 @@ void array_inner_ivec_lin2cart_(array_inner_ivec_t coor, uint64 lin, array_inner
 #define Array(T) Array_##T
 
 #define array_template_type_definition(T) typedef struct array_##T##_t{ \
-    array_inner_ivec_t s; \
+    Vector_uint64 s; \
     T *v; \
 } Array(T);
 
 // alloc
 
-#define array_template_alloc_declaration(T) Array(T) array_##T##_alloc(array_inner_ivec_t s)
+#define array_template_alloc_declaration(T) Array(T) array_##T##_alloc(Vector_uint64 s)
 
 #define array_template_alloc_definition(T) array_template_alloc_declaration(T){ \
     Array(T) _arr;                                                  \
-    _arr.s = array_inner_ivec_dcopy(s);                             \
-    _arr.v = (T *)malloc(array_inner_ivec_product(s) * sizeof(T));  \
+    _arr.s = vector_uint64_dcopy(s);                             \
+    _arr.v = (T *)malloc(vector_uint64_product(s) * sizeof(T));  \
     return _arr;                                                    \
+}
+
+// read
+
+#define array_template_read_declaration(T) Array(T) array_##T##_read(int fid)
+
+#define array_template_read_definition(T) array_template_read_declaration(T){ \
+    uint64 n;                                                                 \
+    Array(T) _arr;                                                            \
+    _arr.s = vector_uint64_read(fid);                                         \
+    n = vector_uint64_product(_arr.s);                                        \
+    _arr.v = (T *)malloc(n * sizeof(T));                                      \
+    read(fid, _arr.v, n * sizeof(T));                                         \
+    return _arr;                                                              \
+}
+
+#define array_template_write_declaration(T) void array_##T##_write(int fid, Array(T) arr)
+
+#define array_template_write_definition(T) array_template_write_declaration(T){ \
+    vector_uint64_write(fid, arr.s);                                            \
+    write(fid, arr.v, vector_uint64_product(arr.s) * sizeof(T));                \
 }
 
 // free
@@ -102,23 +206,23 @@ void array_inner_ivec_lin2cart_(array_inner_ivec_t coor, uint64 lin, array_inner
 #define array_template_free_definition(T) array_template_free_declaration(T){ \
     if(arr->v != NULL) free(arr->v);    \
     arr->v = NULL;                      \
-    array_inner_ivec_free_(&(arr->s));  \
+    vector_uint64_free_(&(arr->s));  \
 }
 
 // get value
 
-#define array_template_get_declaration(T) T array_##T##_get(Array(T) arr, array_inner_ivec_t coor)
+#define array_template_get_declaration(T) T array_##T##_get(Array(T) arr, Vector_uint64 coor)
 
 #define array_template_get_definition(T)  array_template_get_declaration(T){ \
-    return arr.v[array_inner_ivec_cart2lin(coor, arr.s)]; \
+    return arr.v[vector_uint64_cart2lin(coor, arr.s)]; \
 }
 
 // set value
 
-#define array_template_set_declaration(T) void array_##T##_set_(Array(T) arr, array_inner_ivec_t coor, T val)
+#define array_template_set_declaration(T) void array_##T##_set_(Array(T) arr, Vector_uint64 coor, T val)
 
 #define array_template_set_definition(T) array_template_set_declaration(T){ \
-    arr.v[array_inner_ivec_cart2lin(coor, arr.s)] = val;    \
+    arr.v[vector_uint64_cart2lin(coor, arr.s)] = val;    \
     return;                                                 \
 }
 
@@ -126,22 +230,42 @@ void array_inner_ivec_lin2cart_(array_inner_ivec_t coor, uint64 lin, array_inner
 
 // map
 
+// reshape
+
+#define array_template_reshape_declaration(T) Array(T) array_##T##_reshape(Array(T) arr, Vector_uint64 size)
+
+#define array_template_reshape_definition(T) array_template_reshape_declaration(T){ \
+    Array(T) _arr; \
+    _arr.s = vector_uint64_dcopy(size); \
+    _arr.v = (T *)malloc(vector_uint64_product(size) * sizeof(T)); \
+    memcpy(_arr.v, arr.v, vector_uint64_product(size) * sizeof(T));                 \
+return _arr;                                                                                    \
+}
+
 // macro set
 
 #define array_template_collection_declaration(T) array_template_type_definition(T) \
 array_template_alloc_declaration(T); \
+array_template_read_declaration(T); \
+array_template_write_declaration(T); \
 array_template_free_declaration(T); \
 array_template_get_declaration(T); \
-array_template_set_declaration(T);
+array_template_set_declaration(T); \
+array_template_reshape_declaration(T);
 
 #define array_template_collection_definition(T) array_template_alloc_definition(T) \
+array_template_read_definition(T); \
+array_template_write_definition(T); \
 array_template_free_definition(T) \
 array_template_get_definition(T) \
-array_template_set_definition(T)
+array_template_set_definition(T) \
+array_template_reshape_definition(T)
 
 array_template_collection_declaration(int)
 
 array_template_collection_declaration(int64)
+
+array_template_collection_declaration(uint64)
 
 array_template_collection_declaration(float)
 
