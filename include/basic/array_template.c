@@ -25,16 +25,18 @@
 
 #include "array_template.h"
 
-vector_template_collection_definition(uint64)
-vector_template_collection_definition(int)
-vector_template_collection_definition(int64)
-vector_template_collection_definition(float)
-vector_template_collection_definition(double)
+vector_template_collection_definition(Int)
+
+vector_template_collection_definition(UInt)
+
+vector_template_collection_definition(Float)
+
+vector_template_collection_definition(Complex)
 
 
-uint64 vector_uint64_cart2lin(Vector_uint64 coor, Vector_uint64 size){
-    uint64 index;
-    int64 i;
+UInt vector_UInt_cart2lin(Vector(UInt) coor, Vector(UInt) size){
+    UInt index;
+    Int i;
 #ifdef ARRAY_CHECK_BOUNDARY
     for(i = 0; i < coor.n; i++)
         if(vector_get(coor, i) >= vector_get(size, i)){
@@ -44,27 +46,25 @@ uint64 vector_uint64_cart2lin(Vector_uint64 coor, Vector_uint64 size){
         }
 #endif
     index = vector_get(coor, coor.n - 1);
-    for(i = (int64)coor.n - 2; i >= 0; i -= 1){
+    for(i = (Int)coor.n - 2; i >= 0; i -= 1){
         index *= vector_get(size, i);
         index += vector_get(coor, i);
     }
     return index;
 }
 
-void vector_uint64_lin2cart_(Vector_uint64 coor, uint64 lin, Vector_uint64 size){
-    uint64 i;
+void vector_UInt_lin2cart_(Vector(UInt) coor, UInt lin, Vector(UInt) size){
+    UInt i;
     for(i = 0; i < coor.n; i++){
         vector_get(coor, i) = lin % vector_get(size, i);
         lin /= vector_get(size, i);
     }
 }
 
-array_template_collection_definition(int)
+array_template_collection_definition(Int)
 
-array_template_collection_definition(uint64)
+array_template_collection_definition(UInt)
 
-array_template_collection_definition(int64)
+array_template_collection_definition(Float)
 
-array_template_collection_definition(float)
-
-array_template_collection_definition(double)
+array_template_collection_definition(Complex)

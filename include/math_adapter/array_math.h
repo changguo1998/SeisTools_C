@@ -34,7 +34,7 @@
 #define vector_template_sum_declaration(T) T vector_##T##_sum(Vector(T) vec)
 
 #define vector_template_sum_definition(T) vector_template_sum_declaration(T){ \
-    uint64 i; \
+    UInt i; \
     T v; \
     v = (T)0; \
     for(i=0; i<vec.n; i++) v += vector_get(vec, i); \
@@ -52,7 +52,7 @@
 #define vector_template_var_declaration(S, T) S vector_##T##_var(Vector(T) vec, S correct)
 
 #define vector_template_var_definition(S, T) vector_template_var_declaration(S, T){ \
-    uint64 i; \
+    UInt i; \
     S m, v; \
     m = vector_##T##_mean(vec); \
     v = (S)0; \
@@ -70,13 +70,13 @@
 
 // sort
 
-#define vector_template_sort_declaration(T) Vector(uint64) vector_##T##_sort_(Vector(T) vec)
+#define vector_template_sort_declaration(T) Vector(UInt) vector_##T##_sort_(Vector(T) vec)
 
 #define vector_template_sort_definition(T) vector_template_sort_declaration(T){ \
-    uint64 i, j, ibuff; \
+    UInt i, j, ibuff; \
     T ebuff; \
-    Vector(uint64) perm; \
-    perm = vector_uint64_alloc(vec.n); \
+    Vector(UInt) perm; \
+    perm = vector_UInt_alloc(vec.n); \
     for(i=0; i<vec.n; i++) vector_get(vec, i) = i; \
     for(i=0; i<vec.n-1; i++) \
         for(j=i+1; j<vec.n; j++) \
@@ -96,10 +96,10 @@
 #define array_template_sum_declaration(T) T array_##T##_sum(Array(T) arr)
 
 #define array_template_sum_definition(T) array_template_sum_declaration(T){ \
-    uint64 i, n; \
+    UInt i, n; \
     T v; \
     v = (T)0; \
-    n = vector_uint64_product(arr.s); \
+    n = vector_UInt_product(arr.s); \
     for(i=0; i<n; i++) v += arr.v[i]; \
     return v; \
 }
@@ -109,7 +109,7 @@
 #define array_template_mean_declaration(S, T) S array_##T##_mean(Array(T) arr)
 
 #define array_template_mean_definition(S, T) array_template_mean_declaration(S,T){ \
-    return ((S)array_##T##_sum(arr))/((S)vector_uint64_product(arr.s)); \
+    return ((S)array_##T##_sum(arr))/((S)vector_UInt_product(arr.s)); \
 }
 
 // var
@@ -118,9 +118,9 @@
 
 #define array_template_var_definition(S, T) array_template_var_declaration(S,T){ \
     S v, m; \
-    uint64 i, n; \
+    UInt i, n; \
     m = (S)0; \
-    n = vector_uint64_product(arr.s); \
+    n = vector_UInt_product(arr.s); \
     for( i = 0; i < n; i++ ) m += (S)arr.v[i]; \
     m /= n; \
     v = (S)0; \
@@ -139,14 +139,14 @@
 
 // sort
 
-#define array_template_sort_declaration(T) Array(uint64) array_##T##_sort_(Array(T) arr)
+#define array_template_sort_declaration(T) Array(UInt) array_##T##_sort_(Array(T) arr)
 
 #define array_template_sort_definition(T) array_template_sort_declaration(T){ \
-    uint64 i, j, n, ibuff; \
+    UInt i, j, n, ibuff; \
     T ebuff; \
-    Array(uint64) perm; \
-    perm = array_uint64_alloc(arr.s); \
-    n = vector_uint64_product(arr.s); \
+    Array(UInt) perm; \
+    perm = array_UInt_alloc(arr.s); \
+    n = vector_UInt_product(arr.s); \
     for(i=0; i<n; i++) perm.v[i] = i; \
     for(i=0; i<n-1; i++) \
         for(j=i+1; j<n; j++) \
@@ -166,13 +166,13 @@
 #define array_template_product_A_B_declaration(T) Array(T) array_##T##_product_AB(Array(T) A, Array(T) B)
 
 #define array_template_product_A_B_definition(T) array_template_product_A_B_declaration(T){ \
-    uint64 i;                                                                               \
-    Vector(uint64) size, cA, cB, cC;                                                                    \
+    UInt i;                                                                               \
+    Vector(UInt) size, cA, cB, cC;                                                                    \
     Array(T) C;                                                                             \
-    size = vector_uint64_alloc(A.s.n+B.s.n-2);                                              \
-    cA = vector_uint64_alloc(A.s.n);                                                        \
-    cB = vector_uint64_alloc(B.s.n);                                                        \
-    cC = vector_uint64_dcopy(size);\
+    size = vector_UInt_alloc(A.s.n+B.s.n-2);                                              \
+    cA = vector_UInt_alloc(A.s.n);                                                        \
+    cB = vector_UInt_alloc(B.s.n);                                                        \
+    cC = vector_UInt_dcopy(size);\
     for(i=0; i<A.s.n-1; i++) vector_get(size, i) = vector_get(A.s, i);                      \
     for(i=0; i<B.s.n-1; i++) vector_get(size, i+A.s.n-1) = vector_get(B.s, i);              \
     C = array_##T##_alloc(size);                                                            \
@@ -202,14 +202,8 @@ array_template_var_definition(S, T) \
 array_template_std_definition(S, T) \
 array_template_sort_definition(T)
 
-array_template_math_collection_declaration(float, int)
+array_template_math_collection_declaration(Float, Int)
 
-array_template_math_collection_declaration(double, uint64)
-
-array_template_math_collection_declaration(double, int64)
-
-array_template_math_collection_declaration(float, float)
-
-array_template_math_collection_declaration(double, double)
+array_template_math_collection_declaration(Float, Float)
 
 #endif //SEISTOOLS_C_ARRAY_MATH_H

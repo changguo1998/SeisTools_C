@@ -37,15 +37,24 @@
 #include <unistd.h>
 #include <time.h>
 
+#define USE_64_BIT 1
+
 typedef unsigned char uint8;
 typedef signed char int8;
 typedef unsigned int uint32;
 typedef unsigned long int uint64;
 typedef signed long int int64;
 
+#if USE_64_BIT == 1
 typedef int64 Int;
 typedef uint64 UInt;
 typedef double Float;
 typedef double complex Complex;
+#else
+typedef int Int;
+typedef uint32 UInt;
+typedef float Float;
+typedef float complex Complex;
+#endif
 
 #endif //SEISTOOLS_C_BASIC_TYPES_H

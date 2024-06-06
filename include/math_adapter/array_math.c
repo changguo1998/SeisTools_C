@@ -25,12 +25,6 @@
 
 #include "array_math.h"
 
-array_template_math_collection_definition(float, int)
+array_template_math_collection_definition(Float, Int)
 
-array_template_math_collection_definition(double, uint64)
-
-array_template_math_collection_definition(double, int64)
-
-array_template_math_collection_definition(float, float)
-
-array_template_math_collection_definition(double, double)
+array_template_math_collection_definition(Float, Float)
