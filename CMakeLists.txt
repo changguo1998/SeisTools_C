@@ -1,22 +1,24 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.15)
 
 project(SeisToolS_C VERSION 0.0.1 LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
-set(CMAKE_INSTALL_PREFIX ./bin)
-set(INC ./include)
+set(CMAKE_INSTALL_PREFIX bin)
+list(APPEND INC ${PROJECT_SOURCE_DIR}/include "D:/Research/Projects/c-basic-library/include")
+list(APPEND LIB "D:/Research/Projects/c-basic-library/build/")
+message("INC: ${INC}")
+include_directories(${INC})
 
-file(GLOB_RECURSE INC_BASIC ${INC}/basic/*.c)
-add_library(basic STATIC ${INC_BASIC})
+file(GLOB headers include/*.h)
+file(GLOB sources src/*.c)
 
-file(GLOB_RECURSE INC_MATH ${INC}/math_adapter/*.c)
-add_library(math STATIC ${INC_MATH})
+message("headers: ${headers}")
+message("sources: ${sources}")
 
-file(GLOB_RECURSE INC_SEISMIC ${INC}/seismic/*.c)
-add_library(seismic ${INC_SEISMIC})
+add_library(SeisTools STATIC ${headers} ${sources})
+target_include_directories(SeisTools PRIVATE ${INC})
 
-add_executable(test_datetime.exe test/test_datetime.c)
-target_link_libraries(test_datetime.exe basic)
-
-add_executable(test_array.exe test/test_array.c)
-target_link_libraries(test_array.exe basic math)
+add_executable(Geometry ${headers} ${sources} test/Geometry.c)
+target_include_directories(Geometry PRIVATE ${INC})
+target_link_directories(Geometry PRIVATE ${LIB})
+target_link_libraries(Geometry libCBL.a)
