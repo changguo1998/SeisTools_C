@@ -4,8 +4,8 @@ project(SeisToolS_C VERSION 0.0.1 LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_INSTALL_PREFIX bin)
-list(APPEND INC ${PROJECT_SOURCE_DIR}/include "D:/Research/Projects/c-basic-library/include")
-list(APPEND LIB "D:/Research/Projects/c-basic-library/build/")
+list(APPEND INC ${PROJECT_SOURCE_DIR}/include "../c-basic-library/include")
+list(APPEND LIB "../c-basic-library/build/")
 message("INC: ${INC}")
 include_directories(${INC})
 
